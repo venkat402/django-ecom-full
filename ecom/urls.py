@@ -16,12 +16,20 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from accounts import urls as accounts_urls
-from django.conf.urls.static import static
-from django.conf import settings
+from cart import urls as cart_urls
+from category import urls as category_urls
+from home import urls as home_urls
+from order import urls as order_urls
+from product import urls as product_urls
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('accounts/', include(accounts_urls))
+    path('accounts/', include(accounts_urls)),
+    path('cart/', include(cart_urls)),
+    path('category/', include(category_urls)),
+    path('', include(home_urls)),
+    path('order/', include(order_urls)),
+    path('product/', include(product_urls)),
 ]
 urlpatterns += staticfiles_urlpatterns()
