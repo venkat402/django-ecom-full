@@ -1,8 +1,8 @@
 from django.urls import path, include
-from order import views
+from subscribe import views
 
-app_name = "order"
+app_name = "subscribe"
 urlpatterns = [
     # path('index/', views.login, name='cart_index'),
-
+    path('', views.subscribe, name='index'),
 ]
