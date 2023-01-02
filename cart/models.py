@@ -27,6 +27,7 @@ class Cart(models.Model):
         null=True,
         related_name="shipping"
     )
+    shipping_method = models.CharField(max_length=255, blank=True, null=True)
     discount = models.CharField(max_length=255, blank=True, null=True)
     status = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)

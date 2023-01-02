@@ -26,6 +26,7 @@ class Order(models.Model):
         null=True,
         related_name="shippings"
     )
+    shipping_method = models.CharField(max_length=255, blank=True, null=True)
     discount = models.CharField(max_length=255, blank=True, null=True)
     total = models.CharField(max_length=255, blank=True, null=True)
     payment_type = models.CharField(max_length=255, blank=True, null=True)

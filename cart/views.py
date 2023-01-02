@@ -13,13 +13,14 @@ def index(request):
     if not user_id:
         messages.error(request, 'Please login to continue')
         return redirect('accounts:login')
-    cart_id = Cart.objects.get(user_id=user_id).id
+    cart_id = Cart.objects.filter(user_id=user_id)
     if not cart_id:
         result = {
             "items": [],
             "total": 0
         }
         return render(request, 'cart.html', context=result)
+    cart_id = cart_id['id']
     items = CartItem.objects.select_related('product', 'cart').filter(cart_id=cart_id)
     total = 0
     if items:
@@ -41,7 +42,7 @@ def add_cart(request):
         return redirect('accounts:login')
     if request.method == "POST":
         product_id = request.POST.get('id')
-        cart_id = Cart.objects.get(user_id=user_id).id
+        cart_id = Cart.objects.filter(user_id=user_id)
         if not cart_id:
             c = Cart(user_id=user_id)
             c.save()
@@ -66,13 +67,14 @@ def checkout_shipping(request):
     if not user_id:
         messages.error(request, 'Please login to continue')
         return redirect('accounts:login')
-    cart_id = Cart.objects.get(user_id=user_id).id
+    cart_id = Cart.objects.filter(user_id=user_id)
     if not cart_id:
         result = {
             "items": [],
             "total": 0
         }
         return render(request, 'checkout.html', context=result)
+    cart_id = cart_id['id']
     items = CartItem.objects.select_related('product', 'cart').filter(cart_id=cart_id)
     total = 0
     if items:
@@ -88,7 +90,32 @@ def checkout_shipping(request):
 
 
 def checkout_payment(request):
-    return render(request, 'checkout-payment.html')
+    user_id = request.user.id
+    if not user_id:
+        messages.error(request, 'Please login to continue')
+        return redirect('accounts:login')
+    cart_id = Cart.objects.filter(user_id=user_id)
+    if not cart_id:
+        result = {
+            "items": [],
+            "total": 0
+        }
+        return render(request, 'checkout.html', context=result)
+    cart_id = cart_id['id']
+    items = CartItem.objects.select_related('product', 'cart').filter(cart_id=cart_id)
+    total = 0
+    cart = Cart.objects.select_related('address').get(id=cart_id)
+    if items:
+        for temp in items:
+            each = int(temp.quantity) * float(temp.product.price)
+            temp.total = each
+            total += each
+    result = {
+        "items": items,
+        "total": round(total, 2),
+        "cart": cart
+    }
+    return render(request, 'checkout-payment.html', context=result)
 
 
 def checkout(request):
@@ -96,13 +123,14 @@ def checkout(request):
     if not user_id:
         messages.error(request, 'Please login to continue')
         return redirect('accounts:login')
-    cart_id = Cart.objects.get(user_id=user_id).id
+    cart_id = Cart.objects.filter(user_id=user_id)
     if not cart_id:
         result = {
             "items": [],
             "total": 0
         }
         return render(request, 'checkout.html', context=result)
+    cart_id = cart_id['cart_id']
     items = CartItem.objects.select_related('product', 'cart').filter(cart_id=cart_id)
     total = 0
     if items:
@@ -157,3 +185,26 @@ def save_address(request):
         return redirect('cart:shipping')
     if request.method == "GET":
         return redirect('cart:shipping')
+
+
+def shipping_method(request):
+    if request.method == "POST":
+        user_id = request.user.id
+        if not user_id:
+            messages.error(request, 'Please login to continue')
+            return redirect('accounts:login')
+        cart_id = Cart.objects.filter(user_id=user_id)
+        if not cart_id:
+            result = {
+                "items": [],
+                "total": 0
+            }
+            return render(request, 'checkout-payment.html', context=result)
+        cart_id = cart_id['id']
+        data = Cart.objects.filter(id=cart_id).first()
+        data.shipping_method = request.POST.get('checkoutShippingMethod')
+        data.save()
+        messages.success(request, "shipping method saved successfully")
+        return redirect('cart:payment')
+    if request.method == "GET":
+        return redirect('cart:payment')
