@@ -1,3 +1,5 @@
+import pdb
+
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.contrib.auth import get_user_model
@@ -40,11 +42,14 @@ def login(request):
     if request.method == "POST":
         email = request.POST['email']
         password = request.POST['password']
-        user = auth.authenticate(email, password)
+        user = auth.authenticate(email=email, password=password)
         if user:
             auth.login(request, user)
+            messages.error(request, 'welcome come back!')
+            return redirect('home:index')
         else:
-            return render(request, 'login.html', {'error': 'Username or password is incorrect!'})
+            messages.error(request, 'Username or password is incorrect!')
+            return render(request, 'login.html')
     else:
         return render(request, 'login.html')
 

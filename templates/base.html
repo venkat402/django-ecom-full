@@ -46,6 +46,20 @@
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         </style>
     </noscript>
 
@@ -90,15 +104,19 @@
 
                         <!-- Search navbar overlay-->
                         <div class="navbar-search d-none">
-                            <div class="input-group mb-3 h-100">
+                            <form action="{% url 'product:search' %}" method="GET">
+                                <div class="input-group mb-3 h-100">
                                     <span class="input-group-text px-4 bg-transparent border-0"><i
                                             class="ri-search-line ri-lg"></i></span>
-                                <input type="text" class="form-control text-body bg-transparent border-0"
-                                       placeholder="Enter your search terms...">
-                                <span
-                                        class="input-group-text px-4 cursor-pointer disable-child-pointer close-search bg-transparent border-0"><i
-                                        class="ri-close-circle-line ri-lg"></i></span>
-                            </div>
+                                    <input type="text" name="name"
+                                           class="form-control text-body bg-transparent border-0"
+                                           placeholder="Enter your search terms...">
+                                    <span
+                                            class="input-group-text px-4 cursor-pointer disable-child-pointer close-search bg-transparent border-0"><i
+                                            class="ri-close-circle-line ri-lg"></i></span>
+                                    <input type="submit" hidden="">
+                                </div>
+                            </form>
                         </div>
                         <div class="search-overlay"></div>
                         <!-- / Search navbar overlay-->
@@ -107,10 +125,24 @@
                     <!-- /Navbar Search-->
 
                     <!-- Navbar Login-->
-                    <li class="ms-1 d-none d-lg-inline-block">
-                        <a class="nav-link text-body" href="{% url 'accounts:login' %}">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle nav-link text-body" href="#" role="button"
+                           data-bs-toggle="dropdown"
+                           aria-expanded="false">
+                            {% if user.is_authenticated %}
+                            {{user.first_name}}
+                            {% else %}
                             Account
+                            {% endif %}
                         </a>
+                        <ul class="dropdown-menu">
+                            {% if user.is_authenticated %}
+                            <li><a class="dropdown-item" href="{% url 'accounts:logout' %}">Logout</a></li>
+                            {% else %}
+                            <li><a class="dropdown-item" href="{% url 'accounts:register' %}">Register</a></li>
+                            <li><a class="dropdown-item" href="{% url 'accounts:login' %}">Login</a></li>
+                            {% endif %}
+                        </ul>
                     </li>
                     <!-- /Navbar Login-->
 
@@ -189,7 +221,7 @@
                                 <a href="{% url 'cart:index' %}" class="btn btn-outline-dark w-100 text-center mt-4"
                                    role="button">View
                                     Cart</a>
-                                <a href="{% url 'cart:index' %}" class="btn btn-dark w-100 text-center mt-2"
+                                <a href="{% url 'cart:checkout' %}" class="btn btn-dark w-100 text-center mt-2"
                                    role="button">Proceed
                                     To Checkout</a>
                             </div>
@@ -507,8 +539,8 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{% url 'category:index' %}" role="button">
-                                Sale
+                            <a class="nav-link" href="{% url 'product:search' %}?name=" role="button">
+                                All
                             </a>
                         </li>
                         <li class="nav-item dropdown">

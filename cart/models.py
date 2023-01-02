@@ -34,6 +34,12 @@ class Cart(models.Model):
 
 
 class CartItem(models.Model):
+    cart = models.ForeignKey(
+        Cart,
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True
+    )
     product = models.ForeignKey(
         Product,
         on_delete=models.SET_NULL,
