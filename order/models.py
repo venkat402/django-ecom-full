@@ -49,8 +49,6 @@ class OrderItem(models.Model):
         null=True
     )
     quantity = models.CharField(max_length=255, blank=True, null=True)
-    discount = models.CharField(max_length=255, blank=True, null=True)
-    total = models.CharField(max_length=255, blank=True, null=True)
     status = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
