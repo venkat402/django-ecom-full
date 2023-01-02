@@ -45,6 +45,7 @@
 
 
 
+
         </style>
     </noscript>
 
@@ -537,6 +538,14 @@
         </div>
     </div>
 </nav>
+{% for message in messages %}
+
+<div class="alert alert-success">
+    <a class="close" href="#" data-dismiss="alert">×</a>
+    {{ message }}
+</div>
+
+{% endfor %}
 <!-- / Navbar-->    <!-- / Navbar-->
 <!--main block start-->
 {% block content %}{% endblock %}

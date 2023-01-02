@@ -1,25 +1,37 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from django.contrib import auth
+from django.contrib import messages
+
+User = get_user_model()
 
 
 # Create your views here.
 
 
 def register(request):
+    User = get_user_model()
     if request.method == "POST":
+        exist = None
         try:
             User.objects.get(email=request.POST['email'])
             exist = True
-            return render(request, 'register.html', {'error': 'Username is already taken!'})
         except User.DoesNotExist:
             exist = False
-        if not exist:
-            user = User.objects.create_user(request.POST['first_name'], request.POST['last_name'],
-                                            request.POST['email'], password=request.POST['password'])
+        if exist:
+            messages.error(request, 'User email already exists')
+            return render(request, 'register.html')
+        else:
+            user = User.objects.create_user(username=request.POST.get('email'),
+                                            first_name=request.POST.get('first_name'),
+                                            last_name=request.POST.get('last_name'),
+                                            email=request.POST.get('email'),
+                                            password=request.POST.get('password'))
             auth.login(request, user)
+            messages.success(request, 'welcome come back!')
             return redirect('home:index')
+
     else:
         return render(request, 'register.html')
 

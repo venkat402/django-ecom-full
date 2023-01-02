@@ -5,7 +5,7 @@ from subscribe.models import Subscribe
 
 
 class SubscribeAdmin(admin.ModelAdmin):
-    list_display = [field.name for field in Subscribe._meta.get_fields()]
+    list_display = [field.name for field in Subscribe._meta.fields]
 
 
 admin.site.register(Subscribe, SubscribeAdmin)
