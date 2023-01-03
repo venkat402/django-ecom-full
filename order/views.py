@@ -12,11 +12,12 @@ def add(request):
         if not user_id:
             messages.error(request, 'Please login to continue')
             return redirect('accounts:login')
-        cart_id = Cart.objects.get(user_id=user_id).id
+        cart_id = Cart.objects.filter(user_id=user_id).first()
         if not cart_id:
             messages.error(request, 'Cart items not found')
             return redirect('home:index')
         # get cart details
+        cart_id = cart_id.id
         get_cart = Cart.objects.select_related('address', 'shipping').filter(user_id=user_id).first()
         # create order
         c_order = Order(user_id=request.user.id, address_id=get_cart.address.id,

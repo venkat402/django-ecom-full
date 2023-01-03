@@ -13,14 +13,14 @@ def index(request):
     if not user_id:
         messages.error(request, 'Please login to continue')
         return redirect('accounts:login')
-    cart_id = Cart.objects.filter(user_id=user_id)
+    cart_id = Cart.objects.filter(user_id=user_id).first()
     if not cart_id:
         result = {
             "items": [],
             "total": 0
         }
         return render(request, 'cart.html', context=result)
-    cart_id = cart_id['id']
+    cart_id = cart_id.id
     items = CartItem.objects.select_related('product', 'cart').filter(cart_id=cart_id)
     total = 0
     if items:
@@ -42,11 +42,13 @@ def add_cart(request):
         return redirect('accounts:login')
     if request.method == "POST":
         product_id = request.POST.get('id')
-        cart_id = Cart.objects.filter(user_id=user_id)
+        cart_id = Cart.objects.filter(user_id=user_id).first()
         if not cart_id:
             c = Cart(user_id=user_id)
             c.save()
             cart_id = c.id
+        else:
+            cart_id = cart_id.id
         ci = CartItem.objects.filter(product_id=product_id, cart_id=cart_id).first()
         if ci:
             ci.quantity = int(ci.quantity) + 1
@@ -67,14 +69,14 @@ def checkout_shipping(request):
     if not user_id:
         messages.error(request, 'Please login to continue')
         return redirect('accounts:login')
-    cart_id = Cart.objects.filter(user_id=user_id)
+    cart_id = Cart.objects.filter(user_id=user_id).first()
     if not cart_id:
         result = {
             "items": [],
             "total": 0
         }
         return render(request, 'checkout.html', context=result)
-    cart_id = cart_id['id']
+    cart_id = cart_id.id
     items = CartItem.objects.select_related('product', 'cart').filter(cart_id=cart_id)
     total = 0
     if items:
@@ -94,14 +96,14 @@ def checkout_payment(request):
     if not user_id:
         messages.error(request, 'Please login to continue')
         return redirect('accounts:login')
-    cart_id = Cart.objects.filter(user_id=user_id)
+    cart_id = Cart.objects.filter(user_id=user_id).first()
     if not cart_id:
         result = {
             "items": [],
             "total": 0
         }
         return render(request, 'checkout.html', context=result)
-    cart_id = cart_id['id']
+    cart_id = cart_id.id
     items = CartItem.objects.select_related('product', 'cart').filter(cart_id=cart_id)
     total = 0
     cart = Cart.objects.select_related('address').get(id=cart_id)
@@ -123,14 +125,14 @@ def checkout(request):
     if not user_id:
         messages.error(request, 'Please login to continue')
         return redirect('accounts:login')
-    cart_id = Cart.objects.filter(user_id=user_id)
+    cart_id = Cart.objects.filter(user_id=user_id).first()
     if not cart_id:
         result = {
             "items": [],
             "total": 0
         }
         return render(request, 'checkout.html', context=result)
-    cart_id = cart_id['cart_id']
+    cart_id = cart_id.id
     items = CartItem.objects.select_related('product', 'cart').filter(cart_id=cart_id)
     total = 0
     if items:
@@ -160,6 +162,7 @@ def save_address(request):
                            address=address, state=state,
                            country=country, zip=zips)
         shipping.save()
+        shipping_id = shipping.id
         messages.success(request, "shipping address saved successfully")
         if billing:
             billing = Address(user_id=request.user, type="shipping",
@@ -167,6 +170,7 @@ def save_address(request):
                               address=address, state=state,
                               country=country, zip=zip)
             billing.save()
+            billing_id = billing.id
             messages.success(request, "billing address saved successfully")
         else:
             first_name = request.POST.get('b_first_name')
@@ -181,7 +185,12 @@ def save_address(request):
                               address=address, state=state,
                               country=country, zip=zips)
             billing.save()
+            billing_id = billing.id
             messages.success(request, "billing address saved successfully")
+        cart = Cart.objects.filter(user_id=user_id).first()
+        cart.address_id = billing_id
+        cart.shipping_id = shipping_id
+        cart.save()
         return redirect('cart:shipping')
     if request.method == "GET":
         return redirect('cart:shipping')
@@ -193,14 +202,14 @@ def shipping_method(request):
         if not user_id:
             messages.error(request, 'Please login to continue')
             return redirect('accounts:login')
-        cart_id = Cart.objects.filter(user_id=user_id)
+        cart_id = Cart.objects.filter(user_id=user_id).first()
         if not cart_id:
             result = {
                 "items": [],
                 "total": 0
             }
             return render(request, 'checkout-payment.html', context=result)
-        cart_id = cart_id['id']
+        cart_id = cart_id.id
         data = Cart.objects.filter(id=cart_id).first()
         data.shipping_method = request.POST.get('checkoutShippingMethod')
         data.save()
