@@ -6,7 +6,8 @@
 - Responsive, mobile-friendly design
 - Much more...
 
-![image](https://user-images.githubusercontent.com/29934257/210336613-f7144cfa-35cd-4ff4-871d-3bc78592038f.png)
+![download](https://user-images.githubusercontent.com/29934257/210337807-ed8feb8d-8164-4ea4-b3b6-21763467e0e5.png)
+
 
 ## Installation
 
